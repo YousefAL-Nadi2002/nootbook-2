@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notebook</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+            padding: 20px;
+        }
+        h1 {
+            color: #4b0082;
+            font-size: 36px;
+        }
+        .toolbar {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+        .toolbar button, .toolbar select, .toolbar input {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .toolbar button {
+            background-color: #4caf50;
+            color: white;
+        }
+        .toolbar button:hover {
+            background-color: #45a049;
+        }
+        .toolbar input, .toolbar select {
+            border: 1px solid #ccc;
+        }
+        #editor {
+            width: 80%;
+            height: 200px;
+            margin: auto;
+            padding: 10px;
+            border: 2px solid #4caf50;
+            background-color: #e0ffff;
+            color: black;
+            border-radius: 10px;
+            font-size: 16px;
+            overflow-y: auto;
+        }
+        #colorPicker, #bgColorPicker {
+            display: none;
+            position: absolute;
+            z-index: 1000;
+            background: white;
+            border: 2px solid #4caf50;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        .color-box {
+            width: 30px;
+            height: 30px;
+            display: inline-block;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Notebook</h1>
+    <div class="toolbar">
+        <button onclick="setStyle('bold')">Bold</button>
+        <button onclick="setStyle('italic')">Italic</button>
+        <button onclick="setAlignment('left')">⭠</button>
+        <button onclick="setAlignment('center')">⭡</button>
+        <button onclick="setAlignment('right')">⭢</button>
+        <button onclick="transformText('uppercase')">Upper Case</button>
+        <button onclick="transformText('lowercase')">Lower Case</button>
+        <button onclick="transformText('capitalize')">Capitalize</button>
+        <button onclick="clearEditor()">Clear Text</button>
+        <button onclick="showTextColorPicker()">لون النص</button>
+        <button onclick="showBgColorPicker()">لون الخلفية</button>
+        <input type="number" id="fontSize" placeholder="حجم الخط" onchange="setFontSize()" style="width: 70px;">
+        <select id="fontFamily" onchange="setFontFamily()">
+            <option value="Arial">Arial</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="Courier New">Courier New</option>
+        </select>
+    </div>
+
+    <div id="editor" contenteditable="true">
+        اكتب ملاحظتك هنا...
+    </div>
+    <div id="colorPicker">
+        <div class="color-box" data-color="red" style="background: red;"></div>
+        <div class="color-box" data-color="blue" style="background: blue;"></div>
+        <div class="color-box" data-color="green" style="background: green;"></div>
+        <div class="color-box" data-color="yellow" style="background: yellow;"></div>
+        <div class="color-box" data-color="orange" style="background: orange;"></div>
+        <div class="color-box" data-color="purple" style="background: purple;"></div>
+        <div class="color-box" data-color="black" style="background: black;"></div>
+        <div class="color-box" data-color="white" style="background: white; border: 1px solid #ccc;"></div>
+    </div>
+    <div id="bgColorPicker">
+        <div class="color-box" data-color="red" style="background: red;"></div>
+        <div class="color-box" data-color="blue" style="background: blue;"></div>
+        <div class="color-box" data-color="green" style="background: green;"></div>
+        <div class="color-box" data-color="yellow" style="background: yellow;"></div>
+        <div class="color-box" data-color="orange" style="background: orange;"></div>
+        <div class="color-box" data-color="purple" style="background: purple;"></div>
+        <div class="color-box" data-color="black" style="background: black;"></div>
+        <div class="color-box" data-color="white" style="background: white; border: 1px solid #ccc;"></div>
+    </div>
+
+    <script>
+        function setStyle(style) {
+            document.execCommand(style, false, null);
+        }
+
+        function setAlignment(alignment) {
+            document.execCommand("justify" + alignment, false, null);
+        }
+
+        function transformText(transformType) {
+            let editor = document.getElementById("editor");
+            let text = editor.innerText;
+
+            if (transformType === "uppercase") {
+                editor.innerText = text.toUpperCase();
+            } else if (transformType === "lowercase") {
+                editor.innerText = text.toLowerCase();
+            } else if (transformType === "capitalize") {
+                editor.innerText = text.replace(/\b\w/g, char => char.toUpperCase());
+            }
+        }
+
+        function showTextColorPicker() {
+            let colorPicker = document.getElementById("colorPicker");
+            colorPicker.style.display = "block";
+            colorPicker.onclick = (e) => {
+                if (e.target.classList.contains("color-box")) {
+                    document.execCommand("foreColor", false, e.target.dataset.color);
+                    colorPicker.style.display = "none";
+                }
+            };
+        }
+
+        function showBgColorPicker() {
+            let bgColorPicker = document.getElementById("bgColorPicker");
+            bgColorPicker.style.display = "block";
+            bgColorPicker.onclick = (e) => {
+                if (e.target.classList.contains("color-box")) {
+                    document.getElementById("editor").style.backgroundColor = e.target.dataset.color;
+                    bgColorPicker.style.display = "none";
+                }
+            };
+        }
+
+        function setFontSize() {
+            let size = document.getElementById("fontSize").value;
+            document.execCommand("fontSize", false, 7);
+            let fontElements = document.querySelectorAll("#editor font[size='7']");
+            fontElements.forEach(el => el.removeAttribute("size"));
+            fontElements.forEach(el => (el.style.fontSize = size + "px"));
+        }
+
+        function setFontFamily() {
+            let font = document.getElementById("fontFamily").value;
+            document.execCommand("fontName", false, font);
+        }
+
+        function clearEditor() {
+            document.getElementById("editor").innerHTML = "";
+        }
+    </script>
+
+</body>
+</html>
